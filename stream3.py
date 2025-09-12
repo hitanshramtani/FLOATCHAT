@@ -104,6 +104,88 @@ if st.button("Run"):
                     st.plotly_chart(fig_ts, use_container_width=True)
                 except:
                     pass
+                # 🧂 Salinity over time
+                try:
+                    fig_psal_time = px.line(
+                        df,
+                        x="PROFILE_DATE",
+                        y="PSAL",
+                        color="PLATFORM_NUMBER",
+                        title="🧂 Salinity Variation Over Time",
+                        labels={"PROFILE_DATE": "Date", "PSAL": "Salinity"},
+                    )
+                    st.plotly_chart(fig_psal_time, use_container_width=True)
+                except Exception:
+                    pass
+
+                # 🌡 Temperature over time
+                try:
+                    fig_temp_time = px.line(
+                        df,
+                        x="PROFILE_DATE",
+                        y="TEMP",
+                        color="PLATFORM_NUMBER",
+                        title="🌡 Temperature Variation Over Time",
+                        labels={"PROFILE_DATE": "Date", "TEMP": "Temperature (°C)"},
+                    )
+                    st.plotly_chart(fig_temp_time, use_container_width=True)
+                except Exception:
+                    pass
+
+                # ⬇️ Pressure over time
+                try:
+                    fig_pres_time = px.line(
+                        df,
+                        x="PROFILE_DATE",
+                        y="PRES",
+                        color="PLATFORM_NUMBER",
+                        title="⬇️ Pressure Variation Over Time",
+                        labels={"PROFILE_DATE": "Date", "PRES": "Pressure (dbar)"},
+                    )
+                    st.plotly_chart(fig_pres_time, use_container_width=True)
+                except Exception:
+                    pass
                 
+            elif "PSAL" in df.columns: 
+                try:
+                    fig_psal_time = px.line(
+                        df,
+                        x="PROFILE_DATE",
+                        y="PSAL",
+                        color="PLATFORM_NUMBER",
+                        title="🧂 Salinity Variation Over Time",
+                        labels={"PROFILE_DATE": "Date", "PSAL": "Salinity"},
+                    )
+                    st.plotly_chart(fig_psal_time, use_container_width=True)
+                except:
+                    pass
+
+            elif "TEMP" in df.columns:
+                try:
+                    fig_temp_time = px.line(
+                        df,
+                        x="PROFILE_DATE",
+                        y="TEMP",
+                        color="PLATFORM_NUMBER",
+                        title="🌡 Temperature Variation Over Time",
+                        labels={"PROFILE_DATE": "Date", "TEMP": "Temperature (°C)"},
+                    )
+                    st.plotly_chart(fig_temp_time, use_container_width=True)
+                except:
+                    pass
+
+            elif "PRES" in df.columns:
+                try:
+                    fig_pres_time = px.line(
+                        df,
+                        x="PROFILE_DATE",
+                        y="PRES",
+                        color="PLATFORM_NUMBER",
+                        title="⬇️ Pressure Variation Over Time",
+                        labels={"PROFILE_DATE": "Date", "PRES": "Pressure (dbar)"},
+                    )
+                    st.plotly_chart(fig_pres_time, use_container_width=True)
+                except:
+                    pass
             else:
                 st.warning("No PRES/TEMP/PSAL columns found in result.")
