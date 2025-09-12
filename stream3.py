@@ -8,7 +8,7 @@ from rag_pipeline import main
 
 st.set_page_config(page_title="FloatChat - RAG", layout="wide")
 
-st.title("FloatChat — KVPBot+RAG (ARGO)")
+st.title("HEXAWAVE — ChatBot+RAG (ARGO)")
 
 query = st.text_input("Ask a question about ARGO profiles (e.g., 'Show me salinity profiles near the bay of bangal in Febuary 2025')")
 
