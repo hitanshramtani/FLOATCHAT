@@ -18,13 +18,14 @@ if st.button("Run"):
     else:
         with st.spinner("Running retrieval + LLM → SQL → DB..."):
             try:
-                df = main(query)
+                df,ca_output = main(query)
                 # st.write("DEBUG sample row:", df.iloc[0].to_dict())
 
             except Exception as e:
                 st.error(f"Error: {e}")
                 st.stop()
         st.success(f"Returned {len(df)} rows")
+        st.markdown(ca_output)
         if df.empty:
             st.info("No results.")
         else:

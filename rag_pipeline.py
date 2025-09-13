@@ -37,6 +37,38 @@ def get_data_from_sql(sql_query):
     finally:
         conn.close()
     return df   
+def get_conversational_ai_output(context,user_question):
+    prompt = ChatPromptTemplate.from_template("""
+    You are an expert assistant helping with Argo float oceanographic data.
+    You have two tasks depending on the user’s question:
+
+    1. **Descriptive / factual questions** (e.g. "profiles in Jan 2025", "salinity at 13N 84E"):
+       - Use the provided CONTEXT only.
+       - Answer in natural language, summarizing float ID, date, lat/lon, depth, temperature, salinity.
+       - Never invent values that are not present in the context.
+
+    2. **Statistical / aggregation questions** (e.g. containing terms like avg, average, max, min, count, trend, comparison):
+       - Do NOT attempt to calculate values yourself.
+       - Instead, return exactly this message:
+         "This requires numerical aggregation. Please see the generated SQL query and result table/plot below for details."
+
+    ---
+
+    User Question:
+    {user_question}
+
+    Context Profiles:
+    {context}
+
+    Remember:
+    - Always ground answers in the context.
+    - If unsure, politely say you cannot answer with the given data.
+    - Do NOT hallucinate SQL queries here — that will be handled separately.
+    """)
+    messages = prompt.format_messages(user_question=user_question, context="\n".join(context))
+    chatbot_ca = ChatOpenAI(model_name="gpt-4", temperature=0.2)
+    results = chatbot_ca.invoke(messages)
+    return results.content
 def main(user_question = None):
     if user_question:
         user_question = user_question
@@ -44,7 +76,8 @@ def main(user_question = None):
         user_question = input("Enter the Question: ")
     # user_question  = "Show me salinity and temprature profiles from floats near 80 east and 90 east in january 2025"
     contexts, docs = retrieve_context(user_question, k=10)
+    ca_output = get_conversational_ai_output(contexts,user_question)
     sql_query = get_sql_query(contexts, user_question)
     print("Generated SQL Query: ",sql_query)
     df = get_data_from_sql(sql_query)
-    return df
+    return df, ca_output
