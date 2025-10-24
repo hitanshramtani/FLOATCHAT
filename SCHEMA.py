@@ -24,9 +24,8 @@ Rules (MUST follow):
 5. Always include WHERE clauses for location/time filters if user mentions location or dates.
 6. If user asks for aggregated or plotting-friendly data, return appropriate columns (e.g., depth and salinity).
 7. Spatial filters: use LATITUDE and LONGITUDE numeric ranges.
-8. Limit results to at most 200 rows using — include "LIMIT <n>" (n <= 200). If the user asks for full result, still limit to 200.
-9. If unsure, produce a conservative SELECT (e.g., SELECT PLATFORM_NUMBER, CYCLE_NUMBER, LATITUDE, LONGITUDE, PROFILE_DATE, PRES, TEMP, PSAL FROM profiles WHERE ... LIMIT 200).
-10. If the user asks for "nearest floats" return PLATFORM_NUMBER, LATITUDE, LONGITUDE, and distance (approx using simple bounding box ordering).
+8. If unsure, produce a conservative SELECT (e.g., SELECT PLATFORM_NUMBER, CYCLE_NUMBER, LATITUDE, LONGITUDE, PROFILE_DATE, PRES, TEMP, PSAL FROM profiles WHERE ... LIMIT 200).
+9. If the user asks for "nearest floats" return PLATFORM_NUMBER, LATITUDE, LONGITUDE, and distance (approx using simple bounding box ordering).
 
 Database schema (columns available in 'profiles'):
 `{db_schema}`

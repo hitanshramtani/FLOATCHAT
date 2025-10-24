@@ -18,6 +18,18 @@ embed = OpenAIEmbeddings(model="text-embedding-3-small")
 vectorstore = FAISS.load_local(VECTORSTORE_PATH, embed, allow_dangerous_deserialization=True)
 from SCHEMA import DB_SCHEMA, PROMPT
 db_schema = DB_SCHEMA.format(TABLE_NAME=TABLE_NAME)
+def load_full_data():
+    conn = sqlite3.connect(SQLITE_PATH)
+    try:
+        df = pd.read_sql_query(f"SELECT * FROM {TABLE_NAME}", conn)
+    finally:
+        conn.close()
+    # Parse dates properly
+    if "PROFILE_DATE" in df.columns:
+        df["PROFILE_DATE"] = pd.to_datetime(df["PROFILE_DATE"], errors="coerce")
+    if "JULD" in df.columns:
+        df["JULD"] = pd.to_datetime(df["JULD"], errors="coerce")
+    return df
 def retrieve_context(query: str, k: int = 6):
     docs = vectorstore.similarity_search(query, k=k)
     contexts = [d.page_content for d in docs]
@@ -47,11 +59,6 @@ def get_conversational_ai_output(context,user_question):
        - Answer in natural language, summarizing float ID, date, lat/lon, depth, temperature, salinity.
        - Never invent values that are not present in the context.
 
-    2. **Statistical / aggregation questions** (e.g. containing terms like avg, average, max, min, count, trend, comparison):
-       - Do NOT attempt to calculate values yourself.
-       - Instead, return exactly this message:
-         "This requires numerical aggregation. Please see the generated SQL query and result table/plot below for details."
-
     ---
 
     User Question:
@@ -66,7 +73,7 @@ def get_conversational_ai_output(context,user_question):
     - Do NOT hallucinate SQL queries here — that will be handled separately.
     """)
     messages = prompt.format_messages(user_question=user_question, context="\n".join(context))
-    chatbot_ca = ChatOpenAI(model_name="gpt-4", temperature=0.2)
+    chatbot_ca = ChatOpenAI(model_name="gpt-4o-mini", temperature=0.2)
     results = chatbot_ca.invoke(messages)
     return results.content
 def main(user_question = None):
@@ -76,6 +83,7 @@ def main(user_question = None):
         user_question = input("Enter the Question: ")
     # user_question  = "Show me salinity and temprature profiles from floats near 80 east and 90 east in january 2025"
     contexts, docs = retrieve_context(user_question, k=10)
+    print(contexts)
     ca_output = get_conversational_ai_output(contexts,user_question)
     sql_query = get_sql_query(contexts, user_question)
     print("Generated SQL Query: ",sql_query)
